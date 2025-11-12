@@ -10,7 +10,7 @@ import { connectDB } from './db.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Resolve directory correctly
+// Correctly get directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -25,10 +25,10 @@ connectDB();
 // API routes
 app.use('/api/auth', authRoutes);
 
-// ✅ Serve all static files in same folder (HTML, CSS, JS, images)
+// ✅ Serve all static files (HTML, CSS, JS, images) from the same folder
 app.use(express.static(__dirname));
 
-// ✅ Serve index.html for all unmatched routes
+// ✅ Fallback route: serve index.html for everything else
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
