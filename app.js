@@ -1,37 +1,44 @@
 import express from 'express';
-import cors  from 'cors';
+import cors from 'cors';
 import path from 'path';
-import { fileURLToPath} from 'url';
+import { fileURLToPath } from 'url';
 import 'dotenv/config';
 
 import authRoutes from './auth.js';
-import { connectDB } from './db.js'; 
- 
+import { connectDB } from './db.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-//Get a correct directory.
+// Correctly resolve directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-//Serve static frontend files
-app.use(express.static(path.join(__dirname, 'frontend')));
-
+// Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
+// Connect to MongoDB
+connectDB();
+
+// API routes
+app.use('/api/auth', authRoutes);
+
+// Serve static files from the current directory
+app.use(express.static(__dirname));
+
+// Root route
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.use('/api/auth', authRoutes)
+// Catch-all route (for single-page apps or unmatched paths)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-
+// Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    connectDB();
-}
-
-);
+  console.log(`✅ Server running on port ${PORT}`);
+});
